@@ -118,7 +118,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-	  Halt_us(10);
+	  HAL_Delay(1);
   }
   /* USER CODE END 3 */
 }

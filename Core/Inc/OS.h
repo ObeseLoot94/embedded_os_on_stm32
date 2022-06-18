@@ -7,30 +7,31 @@
 
 #ifndef INC_OS_H_
 #define INC_OS_H_
+#include "main.h"
 
 			/*Macros*/
-#define STACK_SIZE	(150u)
+#define STACK_SIZE	(80u)
 #define MAX_THREADS (5u)
+
+			/*Global Variables*/
+typedef struct{
+	uint32_t *stack_pointer;
+	struct TCB *next;
+	uint32_t stack[STACK_SIZE];
+}TCB;
+
+extern uint8_t thread_ctr;
+extern TCB *current_stack_pt;
+//extern uint8_t task_scanner1;
+//extern uint8_t task_scanner2;
 
 
 			/*Function definitions*/
-void Create_Thread(void (*thread)(), uint32_t *stackp, uint32_t stack_size);
+void Create_Thread(void (*thread_handler)(void));
 void Halt_us(volatile uint32_t time);
 void Halt_ms(volatile uint32_t time);
-
-
-			/*Global Variables*/
-extern uint8_t thread_count;
-extern volatile uint32_t sps[MAX_THREADS][STACK_SIZE];
-extern volatile uint32_t *stack_pointers[MAX_THREADS];
-
-
-
-
-
-
-
-
+void Blink1(void);
+void Blink2(void);
 
 
 

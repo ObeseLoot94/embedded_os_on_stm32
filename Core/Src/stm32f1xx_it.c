@@ -22,6 +22,7 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "OS.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,7 +56,9 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim1;
+
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -180,12 +183,66 @@ void PendSV_Handler(void)
 /**
   * @brief This function handles System tick timer.
   */
-void SysTick_Handler(void)
+__attribute__((naked)) void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
+			/*Save context to the stack*/
+	__disable_irq();
+/*  __asm("push	{PSR}");
+	__asm("push	{PC}");
+	__asm("push	{LR}");
+	__asm("push	{r0}");
+	__asm("push	{r1}");
+	__asm("push	{r2}");
+	__asm("push	{r3}");
+	__asm("push	{r12}");*/
+	__asm("push	{r4}");
+	__asm("push	{r5}");
+	__asm("push	{r6}");
+	__asm("push	{r7}");
+	__asm("push	{r8}");
+	__asm("push	{r9}");
+	__asm("push	{r10}");
+	__asm("push	{r11}");
+	//__asm("push {r4-r11}");
+	__asm("LDR	R0, =current_stack_pt");
+	__asm("LDR	R1, [R0]");
+	__asm("STR	SP, [R1]");
+
+
+	/*Scheduler function*/
+
+	current_stack_pt = current_stack_pt->next;
+
+	/*Load context from the stack*/
+	__asm("LDR	R0,=current_stack_pt");			/*r0=&current_stack_pt*/
+	__asm("LDR	R1, [R0]");			// r1 = *R0; --> r1 = current_stack_pt; --> r1 = current_stack_pt->stack_pointer;
+	__asm("LDR	SP, [R1]");
+	__asm("pop	{r11}");
+	__asm("pop	{r10}");
+	__asm("pop	{r9}");
+	__asm("pop	{r8}");
+	__asm("pop	{r7}");
+	__asm("pop	{r6}");
+	__asm("pop	{r5}");
+	__asm("pop	{r4}");
+	/*__asm("pop	{r12}");
+	__asm("pop	{r3}");
+	__asm("pop	{r2}");
+	__asm("pop	{r1}");
+	__asm("pop	{r0}");*/
+	__enable_irq();
+	__asm("bx 	lr");
+	/*__asm("LDR	R0,=current_stack_pt");
+	__asm("LDR	R1, [R0]");
+	__asm("LDR	SP, [R1]");
+	__asm("pop	{r4-r11}");
+	__enable_irq();
+	__asm("bx 	lr");*/
+
   /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
+
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
@@ -210,6 +267,20 @@ void TIM1_UP_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_IRQn 1 */
 
   /* USER CODE END TIM1_UP_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM2 global interrupt.
+  */
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
 }
 
 /**
